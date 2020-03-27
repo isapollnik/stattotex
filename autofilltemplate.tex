@@ -1,0 +1,80 @@
+\documentclass[12pt]{article}
+\usepackage{caption}
+\usepackage{subfloat}
+\usepackage[digitsep={,}]{siunitx}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amsthm,amssymb,bbm,booktabs,graphicx,xcolor,pdflscape,tabularx,threeparttable,rotating,lscape}
+\usepackage[round,authoryear]{natbib}
+%\bibliographystyle{plainnat}
+\usepackage[bottom]{footmisc}
+%\usepackage[capposition=top]{floatrow}
+\usepackage[hidelinks]{hyperref}
+\usepackage{color}
+\definecolor{webgreen}{rgb}{0,.5,0}
+\definecolor{webbrown}{rgb}{.6,0,0}
+\definecolor{webpurple}{rgb}{0.7,0,0.7}
+\usepackage{tgtermes}
+\usepackage{hyperref}
+\hypersetup{breaklinks = true,  letterpaper=false, colorlinks=true, anchorcolor= webbrown, citecolor= webbrown, filecolor= webbrown, linkcolor= webbrown, menucolor= webbrown, urlcolor= webbrown, citebordercolor= 1 0 0, menubordercolor=1 0 0, urlbordercolor=1 0 0, runbordercolor=1 0 0 }
+\usepackage{setspace}
+\usepackage{comment}
+\usepackage{epstopdf}
+\usepackage{float}
+\usepackage{tikz}
+\usepackage{stackengine}
+\stackMath
+\usepackage{titlesec}
+\usepackage{caption}
+\setlength{\belowcaptionskip}{-5pt}
+\usepackage{setspace}
+\usepackage{placeins}
+\usepackage{etoolbox}
+\usepackage{adjustbox}
+\usepackage{multirow}
+\AtBeginEnvironment{quote}{\singlespacing\small}
+
+% Allow line breaks with \\ in specialcells
+	\newcommand{\specialcell}[2][c]{%
+	\begin{tabular}[#1]{@{}c@{}}#2\end{tabular}}
+
+\DeclareCaptionType{mytype}[Typename][List of mytype]
+\newenvironment{myenv}{\captionsetup{type=mytype}}{}
+
+
+\begin{document}
+%% The key part is here, we import all the numbers we will call.
+\input{numbersintext.tex}
+
+\begin{titlepage} 
+
+\title{\Large This is the title
+\thanks{Thank you to....}\vspace{1cm}}
+
+\author{Author's Name \\ Author's Institution \vspace{1cm}}
+\date{March 2020}
+\maketitle
+\thispagestyle{empty}
+\bigskip
+
+\centerline{\bf Abstract}\vspace{0.5cm}
+
+\noindent The abstract goes here
+
+\end{titlepage}
+
+\doublespace
+\onehalfspacing
+
+\section{Introduction}
+
+This template shows how to use latex and Stata to automatically fill in numbers that are placed in the text. This allows us to never hard-code any numbers, which is more efficient and reduces the risk of making mistakes.
+
+The key file is \textsf{numbersintext.tex} -- see the do file \textsf{fillnumbers.do} for how this is created. This file is populated with commands that take the form \textsf{\textbackslash newcommand\{\textbackslash NAME\}\{STATISTIC\}}, so that whenever you call \textbackslash NAME, STATISTIC will show up.
+
+All you need to do to achieve this is place this at the top of your tex file: \textsf{\textbackslash input\{numbersintext.tex\}}.
+
+Then you can call all the variables you created. For example, this is the value of \textsf{\textbackslash statA}: $\statA$. This is \textsf{\textbackslash statC}: $\statC$. And this is \textsf{\textbackslash meanZ}: \meanZ.
+
+
+
+\end{document}
