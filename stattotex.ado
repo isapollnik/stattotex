@@ -2,7 +2,7 @@
 * Author: Ian Sapollnik
 * Date: March 27, 2020
 program define stattotex
-	syntax using/, STATistic(real) name(string) [replace] [Format(string)] [comment(string)] [record] [force]
+	syntax using/, STATistic(real) name(string) [replace] [Format(string)] [comment(string)] [record] [force] [COLour(string)]
 	* These are LaTeX rules, so need to control.
 	if regexm("`name'","[0-9]") {
 		disp as error "Name cannot have numeric characters."
@@ -87,7 +87,7 @@ program define stattotex
 		}
 	}
 	else {
-		di "File `using' not found, will be created."
+		disp as text "File `using' not found, will be created."
 	}
 	* Write the new command into the file.
 	file write `newtexfile' "`statstringfortex'" _n
