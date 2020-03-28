@@ -18,13 +18,16 @@ program define stattotex
 	}
 	* Make sure you don't try to overwrite an existing LaTeX symbol/command. This is an imperfect approach, since packages might create extra commands. Computationally this makes the package slower, but not by too much. The "force" option will skip this step, but you risk breaking your LaTeX document if you try to overwrite an existing LaTeX command.
 	if "`force'"=="" {
+		cap quietly findfile "stattotex_SYMLIST.txt"
 		tempname SYMLIST
-		file open `SYMLIST' using "SYMLIST.txt", r
+		file open `SYMLIST' using "`r(fn)'", r
 		file read `SYMLIST' linecur
 			while r(eof)==0 {
 				file read `SYMLIST' linecur
-				if "`macval(linecur)'"=="\" + "`name'" {
-					disp as error "This is name is already an existing LaTeX command. Using it this will very likely break your LaTeX document. Use force option to do this anyways."
+				if "`macval(linecur)'" == "\" + "`name'" {
+					disp as error "This is name is already an existing LaTeX command. Using it this will very likely break your LaTeX document."
+					disp as error "Use force option to do this anyways (highly discouraged)."
+					error 498
 				}
 			}
 	}
@@ -76,6 +79,7 @@ program define stattotex
 			file read `oldtexfile' linecur
 		}
 		file close `oldtexfile'
+		* Sometimes the program works too fast to erase this file, need to give a small pause.
 		cap erase "`using'"
 		if _rc!=0 {
 			sleep 200

@@ -42,3 +42,13 @@ gen Z = X^2 - Y^3
 qui sum Z if X>0.6 & Y<=0, meanonly
 local meanZ = `r(mean)'
 stattotex using "$output/numbersintext.tex", stat(`meanZ') name(meanZ) replace f("%9.2f") record comment("This is the mean Z when X>0.6 & Y<=0.")
+
+
+/* Advanced: LaTeX has a lot of built-in commands. So if you want to name one of 
+ your commands "beta", you'll run into issues when you try to compile, as LaTeX 
+has already defined the command \beta to mean the greek letter. To prevent this 
+issue, the package will stop you from overwriting an existing LaTeX command by 
+throwing an error. This is imperfect - you might be using a package that defines
+ more commands that aren't included in base LaTeX, so just be cautious about 
+this in general. If for some reason you really want to do this, you can use the 
+force option in stattotex. This is highly discouraged, however. */
