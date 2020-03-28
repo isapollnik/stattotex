@@ -1,12 +1,32 @@
-* This program exports numbers in Stata for easy inclusion in latex documents
+* This program exports numbers in Stata for easy inclusion in LaTeX documents
 * Author: Ian Sapollnik
 * Date: March 27, 2020
 program define stattotex
-	syntax using/, STATistic(real) name(string) [replace] [Format(string)] [comment(string)] [record]
-	* This is a LaTeX rule, so need to control.
+	syntax using/, STATistic(real) name(string) [replace] [Format(string)] [comment(string)] [record] [force]
+	* These are LaTeX rules, so need to control.
 	if regexm("`name'","[0-9]") {
 		disp as error "Name cannot have numeric characters."
 		error 498
+	}
+	if "`name'"=="" {
+		disp as error "Name cannot be empty."
+		error 498
+	}
+	if !regexm("`name'", "^[a-zA-Z]*$") {
+		disp as error "Name can only contain standard letters."
+		error 498
+	}
+	* Make sure you don't try to overwrite an existing LaTeX symbol/command. This is an imperfect approach, since packages might create extra commands. Computationally this makes the package slower, but not by too much. The "force" option will skip this step, but you risk breaking your LaTeX document if you try to overwrite an existing LaTeX command.
+	if "`force'"=="" {
+		tempname SYMLIST
+		file open `SYMLIST' using "SYMLIST.txt", r
+		file read `SYMLIST' linecur
+			while r(eof)==0 {
+				file read `SYMLIST' linecur
+				if "`macval(linecur)'"=="\" + "`name'" {
+					disp as error "This is name is already an existing LaTeX command. Using it this will very likely break your LaTeX document. Use force option to do this anyways."
+				}
+			}
 	}
 	* If no formatting specified, convert to string as-is.
 	if "`format'"=="" {
@@ -46,7 +66,7 @@ program define stattotex
 				if ("`replace'"=="") {
 					file close `oldtexfile'
 					file close `newtexfile'
-					disp as error "Name already exists. Use replace option to overwrite."
+					disp as error "Name already exists in `using'. Use replace option to overwrite."
 					error 498
 				}
 			}

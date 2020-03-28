@@ -1,5 +1,5 @@
 clear all
-global output  "C:/users/iansa/Desktop/stattotex"
+global output  "C:\Users\iansa\Github\stattotex"
 
 * This do file has examples of how to use stattotex command.
 
@@ -36,7 +36,6 @@ stattotex using "$output/numbersintext.tex", stat(12345.678) name(statF) record 
 * The best use of this command is with locals. Let's create some fake data to show.
 clear
 set obs 1000
-gen id = _n
 gen X = runiform()
 gen Y = rnormal()
 gen Z = X^2 - Y^3
