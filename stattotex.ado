@@ -4,14 +4,14 @@
 * Author: Ian Sapollnik
 * Date: March 28, 2020
 program define stattotex
-	syntax using/, STATistic(string) name(string) [replace] [Format(string)] [comment(string)] [record] [FORCEName] [FORCEStat]
+	syntax using/, STATistic(string) name(string) [replace] [Format(string)] [comment(string)] [record] [FORCEName] [FORCEStat] [STRing]
 	* Check to make sure the statistic is a number, or the expression will evaluate to a number. forcestat will override this
-		if "`forcestat'"=="" {
+		if "`forcestat'"==""  & "`string'"==""{
 			tempname statistic_check
 			cap local `statistic_check' = `statistic'
 			cap confirm number ``statistic_check''
 		if _rc!=0 {
-			disp as error "Statistic must be a real number or evaluate to a real number."
+			disp as error "Statistic must be a real number or evaluate to a real number when option str is not specified."
 			disp as error "Use the forcestat option if you wish to proceed (highly discouraged)."
 			error 498
 		}
@@ -45,7 +45,7 @@ program define stattotex
 			}
 	}
 	tempname statstring
-	if "`forcestat'"=="" {
+	if "`forcestat'"=="" & "`string'"=="" {
 		* If no formatting specified, convert to string as-is.
 		if "`format'"=="" {
 			local `statstring' = string(`statistic')
@@ -75,7 +75,13 @@ program define stattotex
 	}
 	* Create the string that will be fed to LaTeX.
 	tempname statstringfortex
-	local `statstringfortex' = subinstr("\newcommand{\ `name'}{" + "``statstring''" + "}", " ", "", .) + "`comment'"
+	if "`string'"=="" local `statstringfortex' = subinstr("\newcommand{\ `name'}{" + "``statstring''" + "}", " ", "", .) + "`comment'"
+
+
+	if "`string'"!="" {
+		local `statstring' = subinstr("`statistic'", " ", "~", .)  // seqsplit does not allow for normal spaces, use ~ to simulate spaces
+		local `statstringfortex' = "\newcommand{\\`name'}{\seqsplit{" + "``statstring''" + "}}" + "`comment'"
+	}
 	* Create a new LaTeX file that will be the final output.
 	tempname newtexfile
 	tempfile `newtexfile'
@@ -111,8 +117,9 @@ program define stattotex
 	}
 	else {
 		disp as text "File `using' not found, will be created."
+		file write `newtexfile' "\usepackage{seqsplit}" _n	
 	}
-	* Write the new command into the file.
+	* Write the new command into the file. 
 	file write `newtexfile' "``statstringfortex''" _n
 	file close `newtexfile'
 	* Copy the temporary file over to its final location.
