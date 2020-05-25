@@ -79,8 +79,7 @@ program define stattotex
 
 
 	if "`string'"!="" {
-		local `statstring' = subinstr("`statistic'", " ", "~", .)  // seqsplit does not allow for normal spaces, use ~ to simulate spaces
-		local `statstringfortex' = "\newcommand{\\`name'}{\seqsplit{" + "``statstring''" + "}}" + "`comment'"
+		local `statstringfortex' = "\newcommand{\\`name'}{\AddBreakableChars{" + "``statstring''" + "}}" + "`comment'"
 	}
 	* Create a new LaTeX file that will be the final output.
 	tempname newtexfile
@@ -117,10 +116,35 @@ program define stattotex
 	}
 	else {
 		disp as text "File `using' not found, will be created."
-		file write `newtexfile' "\usepackage{seqsplit}" _n	
+		* Write the new command into the file. 
+		file write `newtexfile' "%--------------------------------------%" _n ///
+						"% Preamble for hyphenated strings:" _n ///
+						"\usepackage{hyphenat, xstring, forloop}" _n ///
+						"\newsavebox\MyBreakChar% " _n ///
+						"\sbox\MyBreakChar{\hyp}% char to display the break after non char " _n ///
+						"\newsavebox\MySpaceBreakChar% " _n ///
+						"\sbox\MySpaceBreakChar{}% char to display the break after space " _n ///
+						"\makeatletter% " _n ///
+						"\newcommand*{\BreakableChar}[1][\MyBreakChar]{% " _n ///
+						"  \leavevmode% " _n ///
+						"  \prw@zbreak% " _n ///
+						"  \discretionary{\usebox#1}{}{}% " _n ///
+						"  \prw@zbreak% " _n ///
+						"}% " _n ///
+						"\newcounter{index}% " _n ///
+						"\newcommand{\AddBreakableChars}[1]{% " _n ///
+						"  \StrLen{#1 }[\stringLength]% " _n ///
+						"  \forloop[1]{index}{1}{\value{index}<\stringLength}{% " _n ///
+						"    \StrChar{#1}{\value{index}}[\currentLetter]% " _n ///
+						"    \IfStrEq{\currentLetter}{ } " _n ///
+						"        {\currentLetter\BreakableChar[\MySpaceBreakChar]}% " _n ///
+						"        {\currentLetter\BreakableChar[\MyBreakChar]}% " _n ///
+						"  }% " _n ///
+						"}% " _n ///
+						"%--------------------------------------%" _n
 	}
-	* Write the new command into the file. 
-	file write `newtexfile' "``statstringfortex''" _n
+
+	file write `newtexfile' _n "``statstringfortex''" _n
 	file close `newtexfile'
 	* Copy the temporary file over to its final location.
 	cp "``newtexfile''" "`using'"
