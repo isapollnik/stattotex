@@ -2,14 +2,26 @@
 * @Author: Ian Sapollnik
 * @Date:   March 28, 2020
 * @Last Modified by:   Chris Kontz
-* @Last Modified time: 2020-07-27 11:30:33
+* @Last Modified time: 2020-07-27 19:50:07
 */
 
 * This program exports numbers in Stata for easy inclusion in LaTeX documents
 * Author: Ian Sapollnik
 * Date: March 28, 2020
-program define stattotex
-	syntax using/, STATistic(string) name(string) [replace] [Format(string)] [comment(string)] [record] [FORCEName] [FORCEStat] [STRing]
+program stattotex
+	
+	syntax using/, 
+		STATistic(string) ///
+		name(string) /// 
+		[replace] ///
+		[Format(string)] ///
+		[comment(string)] /// Add a comment
+		[record] /// Record date and time alongside a comment
+		[FORCEName] ///
+		[FORCEStat] /// 
+		[STRing] /// Allows strings as statistics
+		[RESpect] // Respect existing files (important for symlinks)
+
 	* Check to make sure the statistic is a number, or the expression will evaluate to a number. forcestat will override this
 		if "`forcestat'"==""  & "`string'"==""{
 			tempname statistic_check
@@ -34,7 +46,10 @@ program define stattotex
 		disp as error "Name can only contain standard letters."
 		error 498
 	}
-	* Make sure you don't try to overwrite an existing LaTeX symbol/command. This is an imperfect approach, since packages might create extra commands. Computationally this makes the package slower, but not by too much. The forcename option will skip this step, but you risk breaking your LaTeX document if you try to overwrite an existing LaTeX command.
+	/* Make sure you don't try to overwrite an existing LaTeX symbol/command. This is an imperfect approach,
+	 since packages might create extra commands. Computationally this makes the package slower, 
+	 but not by too much. The forcename option will skip this step, but you risk breaking your LaTeX 
+	 document if you try to overwrite an existing LaTeX command. */
 	if "`forcename'"=="" {
 		cap qui findfile "stattotex_SYMLIST.txt"
 		tempname SYMLIST
@@ -81,51 +96,59 @@ program define stattotex
 	* Create the string that will be fed to LaTeX.
 	tempname statstringfortex
 	if "`string'"=="" local `statstringfortex' = subinstr("\newcommand{\ `name'}{" + "``statstring''" + "}", " ", "", .) + "`comment'"
-
-
-	if "`string'"!="" {
-		local `statstringfortex' = "\newcommand{\\`name'}{{" + "``statstring''" + "}}" + "`comment'"
-	}
+	if "`string'"!="" local `statstringfortex' = "\newcommand{\\`name'}{{" + "``statstring''" + "}}" + "`comment'"
 	* Create a new LaTeX file that will be the final output.
 	tempname newtexfile
 	tempfile `newtexfile'
 	file open `newtexfile' using "``newtexfile''", w
-	* If the using LaTeX file already exists, we need to copy its contents over to the new file. If the name has already been used, we either need to skip the line or throw an error if replace has not been specified.
+	/* If the using LaTeX file already exists, we need to copy its contents over to the new file. 
+	If the name has already been used, we either need to skip the line or throw an error if replace has not been specified. */
 	cap confirm file "`using'"
 	if _rc==0 {
-		tempname oldtexfile
-		file open `oldtexfile' using "`using'", r
-		* Iterate over the lines of the file.
-		file read `oldtexfile' linecur
-		while r(eof)==0 {
-			if regexm(subinstr("`macval(linecur)'", "\newcommand{", "", .),"`name'") {
-				if ("`replace'"=="") {
-					file close `oldtexfile'
-					file close `newtexfile'
-					disp as error "Name already exists in `using'. Use replace option to overwrite."
-					error 498
-				}
-			}
-			else {
-				file write `newtexfile' "`macval(linecur)'" _n
-			}
+		if "`respect'"==""{ // do not respect existing files and just replace old file with new file containing old and new content
+			tempname oldtexfile
+			file open `oldtexfile' using "`using'", r
+			* Iterate over the lines of the file.
 			file read `oldtexfile' linecur
+			while r(eof)==0 {
+				if regexm(subinstr("`macval(linecur)'", "\newcommand{", "", .),"`name'") {
+					if ("`replace'"=="") {
+						file close `oldtexfile'
+						file close `newtexfile'
+						disp as error "Name already exists in `using'. Use replace option to overwrite."
+						error 498
+					}
+				}
+				else {
+					file write `newtexfile' "`macval(linecur)'" _n
+				}
+				file read `oldtexfile' linecur
+			}
+			file close `oldtexfile'
+			* Sometimes the program works too fast to erase this file, need to give a small pause.
+			cap erase "`using'"
+			if _rc!=0 {
+				sleep 200
+				erase "`using'"
+			}
 		}
-		file close `oldtexfile'
-		* Sometimes the program works too fast to erase this file, need to give a small pause.
-		cap erase "`using'"
-		if _rc!=0 {
-			sleep 200
-			erase "`using'"
+		else{ // be mindful of existing files and just append the existing using command line / terminal tools
+			 if "`c(os)'" = "MacOSX" | "`c(os)'"=="UNIX" {
+				! echo "``statstringfortex''" >> "`using'"
+			 }
+			 else { // windows (not 100% sure that works too)
+				! echo "``statstringfortex''" >> "`using'"
+			 }
+
 		}
 	}
 	else {
 		disp as text "File `using' not found, will be created."
 		* Write the new command into the file. 
-		file write `newtexfile' "%--------------------------------------%" _n ///
-						"% Preamble for hyphenated strings:" _n ///
-						"\usepackage[USenglish]{babel}"  _n /// 
-						"%--------------------------------------%" _n
+		file write `newtexfile' "%--------------------------------------%" 	_n ///
+									"% Preamble for hyphenated strings:" 	_n ///
+									"\usepackage[USenglish]{babel}"  		_n /// 
+								"%--------------------------------------%" 	_n
 	}
 
 	file write `newtexfile' _n "``statstringfortex''" _n
@@ -133,3 +156,11 @@ program define stattotex
 	* Copy the temporary file over to its final location.
 	cp "``newtexfile''" "`using'"
 end
+
+
+if "`c(os)'"=="MacOSX" | "`c(os)'"=="UNIX" {
+	rsource using my_script.R, rpath("/usr/local/bin/R") roptions(`"--vanilla"')
+}
+else {  // windows
+	rsource using my_script.R, rpath(`"c:\r\R-3.5.1\bin\Rterm.exe"') roptions(`"--vanilla"')  // change version number, if necessary
+}
