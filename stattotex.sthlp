@@ -1,6 +1,6 @@
 {smcl}
-{cmd: stattotex
-{hline}{}
+{cmd: stattotex}
+{hline}
 
 {title:Description}
 
