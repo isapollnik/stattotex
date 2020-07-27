@@ -84,7 +84,7 @@ program define stattotex
 
 
 	if "`string'"!="" {
-		local `statstringfortex' = "\newcommand{\\`name'}{\AddBreakableChars{" + "``statstring''" + "}}" + "`comment'"
+		local `statstringfortex' = "\newcommand{\\`name'}{{" + "``statstring''" + "}}" + "`comment'"
 	}
 	* Create a new LaTeX file that will be the final output.
 	tempname newtexfile
