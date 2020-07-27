@@ -2,7 +2,7 @@
 * @Author: Ian Sapollnik
 * @Date:   March 28, 2020
 * @Last Modified by:   Chris Kontz
-* @Last Modified time: 2020-07-27 11:28:33
+* @Last Modified time: 2020-07-27 11:30:33
 */
 
 * This program exports numbers in Stata for easy inclusion in LaTeX documents
