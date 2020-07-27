@@ -1,17 +1,22 @@
-*! version 1.0  28mar2020
+/*
+* @Author: Ian Sapollnik
+* @Date:   March 28, 2020
+* @Last Modified by:   Chris Kontz
+* @Last Modified time: 2020-07-27 11:30:33
+*/
 
 * This program exports numbers in Stata for easy inclusion in LaTeX documents
 * Author: Ian Sapollnik
 * Date: March 28, 2020
 program define stattotex
-	syntax using/, STATistic(string) name(string) [replace] [Format(string)] [comment(string)] [record] [FORCEName] [FORCEStat]
+	syntax using/, STATistic(string) name(string) [replace] [Format(string)] [comment(string)] [record] [FORCEName] [FORCEStat] [STRing]
 	* Check to make sure the statistic is a number, or the expression will evaluate to a number. forcestat will override this
-		if "`forcestat'"=="" {
+		if "`forcestat'"==""  & "`string'"==""{
 			tempname statistic_check
 			cap local `statistic_check' = `statistic'
 			cap confirm number ``statistic_check''
 		if _rc!=0 {
-			disp as error "Statistic must be a real number or evaluate to a real number."
+			disp as error "Statistic must be a real number or evaluate to a real number when option str is not specified."
 			disp as error "Use the forcestat option if you wish to proceed (highly discouraged)."
 			error 498
 		}
@@ -45,7 +50,7 @@ program define stattotex
 			}
 	}
 	tempname statstring
-	if "`forcestat'"=="" {
+	if "`forcestat'"=="" & "`string'"=="" {
 		* If no formatting specified, convert to string as-is.
 		if "`format'"=="" {
 			local `statstring' = string(`statistic')
@@ -75,7 +80,12 @@ program define stattotex
 	}
 	* Create the string that will be fed to LaTeX.
 	tempname statstringfortex
-	local `statstringfortex' = subinstr("\newcommand{\ `name'}{" + "``statstring''" + "}", " ", "", .) + "`comment'"
+	if "`string'"=="" local `statstringfortex' = subinstr("\newcommand{\ `name'}{" + "``statstring''" + "}", " ", "", .) + "`comment'"
+
+
+	if "`string'"!="" {
+		local `statstringfortex' = "\newcommand{\\`name'}{{" + "``statstring''" + "}}" + "`comment'"
+	}
 	* Create a new LaTeX file that will be the final output.
 	tempname newtexfile
 	tempfile `newtexfile'
@@ -111,9 +121,14 @@ program define stattotex
 	}
 	else {
 		disp as text "File `using' not found, will be created."
+		* Write the new command into the file. 
+		file write `newtexfile' "%--------------------------------------%" _n ///
+						"% Preamble for hyphenated strings:" _n ///
+						"\usepackage[USenglish]{babel}" ///
+						"%--------------------------------------%" _n
 	}
-	* Write the new command into the file.
-	file write `newtexfile' "``statstringfortex''" _n
+
+	file write `newtexfile' _n "``statstringfortex''" _n
 	file close `newtexfile'
 	* Copy the temporary file over to its final location.
 	cp "``newtexfile''" "`using'"

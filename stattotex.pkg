@@ -1,0 +1,8 @@
+v 1.2
+* v is followed by the version number
+d stattotex: generate latex links to avoid hardcoding numbers
+* d is followed by a description of the program
+f stattotex.ado
+f stattotex.sthlp
+F stattotex_SYMLIST.txt
+* and lastly f denotes filenames that belong to your program
