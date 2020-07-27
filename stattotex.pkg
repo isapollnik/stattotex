@@ -4,5 +4,5 @@ d stattotex: generate latex links to avoid hardcoding numbers
 * d is followed by a description of the program
 f stattotex.ado
 f stattotex.sthlp
-f stattotex_SYMLIST.txt
+f stattotex_SYMLIST.ado
 * and lastly f denotes filenames that belong to your program
