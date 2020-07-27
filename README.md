@@ -6,3 +6,5 @@ A Stata command to automatically place a calculation into LaTeX -- no more hard 
 
 See the PDF and do file for more details.
 
+You can install the latest version of the *FORKED* command by executing the following code:
+`net install stattotex, from("https://raw.github.com/cg89x/stattotex/master/") replace`
