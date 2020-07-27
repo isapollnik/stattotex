@@ -1,4 +1,3 @@
 v 1.0
-d stattotex:
+d stattotex: Automatically place calculation into LaTeX  
 p stattotex Automatic calculation into LaTeX 
-* p links to a program package (to the mymean.pkg file) in the same folder.
