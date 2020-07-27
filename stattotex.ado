@@ -124,7 +124,7 @@ program define stattotex
 		* Write the new command into the file. 
 		file write `newtexfile' "%--------------------------------------%" _n ///
 						"% Preamble for hyphenated strings:" _n ///
-						"\usepackage[USenglish]{babel}" ///
+						"\usepackage[USenglish]{babel}" /// _n
 						"%--------------------------------------%" _n
 	}
 
