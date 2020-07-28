@@ -1,8 +1,8 @@
 /*
 * @Author: Ian Sapollnik
 * @Date:   March 28, 2020
-* @Last Modified by:   Chris Kontz
-* @Last Modified time: 2020-07-27 19:50:07
+* @Last Modified by:   ChristianKontz
+* @Last Modified time: 2020-07-27 21:09:08
 */
 
 * This program exports numbers in Stata for easy inclusion in LaTeX documents
@@ -109,7 +109,7 @@ program stattotex
 			tempname oldtexfile
 			file open `oldtexfile' using "`using'", r
 			* Iterate over the lines of the file.
-			file read `oldtexfile' linecur
+			file read `oldtexfile' linecurstat
 			while r(eof)==0 {
 				if regexm(subinstr("`macval(linecur)'", "\newcommand{", "", .),"`name'") {
 					if ("`replace'"=="") {
@@ -133,13 +133,14 @@ program stattotex
 			}
 		}
 		else{ // be mindful of existing files and just append the existing using command line / terminal tools
-			 if "`c(os)'" == "MacOSX" | "`c(os)'"=="UNIX" {
-				! echo "\\\``statstringfortex''" >> "`using'"
-				! echo ""
+			 local `statstringfortex' = "\\\newcommand{\\\\`name'}{{" + "``statstring''" + "}}" + "`comment'"
+			 if "`c(os)'" == "MacOSX" | "`c(os)'"=="UNIX" | "`c(os)'"=="Unix" {
+				! printf "``statstringfortex''" >> "`using'"
+				! echo "" >> "`using'"
 			 }
 			 else { // windows (not 100% sure that works too)
-				! echo "``statstringfortex''" >> "`using'"
-				! echo ""
+				! printf "``statstringfortex''" >> "`using'"
+				! echo "" >> "`using'"
 			 }
 
 		}
