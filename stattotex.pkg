@@ -1,4 +1,4 @@
-v 1.3
+v 1.4
 * v is followed by the version number
 d stattotex: generate latex links to avoid hardcoding numbers
 * d is followed by a description of the program
