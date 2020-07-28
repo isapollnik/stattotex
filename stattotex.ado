@@ -10,7 +10,7 @@
 * Date: March 28, 2020
 program stattotex
 	
-	syntax using/, 
+	syntax using/, ///
 		STATistic(string) ///
 		name(string) /// 
 		[replace] ///
@@ -133,11 +133,13 @@ program stattotex
 			}
 		}
 		else{ // be mindful of existing files and just append the existing using command line / terminal tools
-			 if "`c(os)'" = "MacOSX" | "`c(os)'"=="UNIX" {
-				! echo "``statstringfortex''" >> "`using'"
+			 if "`c(os)'" == "MacOSX" | "`c(os)'"=="UNIX" {
+				! echo "\\\``statstringfortex''" >> "`using'"
+				! echo ""
 			 }
 			 else { // windows (not 100% sure that works too)
 				! echo "``statstringfortex''" >> "`using'"
+				! echo ""
 			 }
 
 		}
@@ -149,18 +151,10 @@ program stattotex
 									"% Preamble for hyphenated strings:" 	_n ///
 									"\usepackage[USenglish]{babel}"  		_n /// 
 								"%--------------------------------------%" 	_n
-	}
 
 	file write `newtexfile' _n "``statstringfortex''" _n
 	file close `newtexfile'
 	* Copy the temporary file over to its final location.
 	cp "``newtexfile''" "`using'"
+	}
 end
-
-
-if "`c(os)'"=="MacOSX" | "`c(os)'"=="UNIX" {
-	rsource using my_script.R, rpath("/usr/local/bin/R") roptions(`"--vanilla"')
-}
-else {  // windows
-	rsource using my_script.R, rpath(`"c:\r\R-3.5.1\bin\Rterm.exe"') roptions(`"--vanilla"')  // change version number, if necessary
-}
