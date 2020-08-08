@@ -2,4 +2,4 @@ v 0.1
 d stattotex: Exporting values for inclusion in LaTeX.
 f stattotex.ado
 f stattotex.sthlp
-f stattotex_SYMLIST.txt
+F stattotex_SYMLIST.txt
