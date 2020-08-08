@@ -1,0 +1,4 @@
+v 0.1
+d Ian Sapollnik
+d isapollnik@princeton.edu
+p stattotex
