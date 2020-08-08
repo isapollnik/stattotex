@@ -1,9 +1,9 @@
-*! version 1.0  28mar2020
-
+*! version 0.1  10aug2020
 * This program exports numbers in Stata for easy inclusion in LaTeX documents
 * Author: Ian Sapollnik
-* Date: March 28, 2020
+* Date: August 10, 2020
 program define stattotex
+	version 10.0
 	syntax using/, STATistic(string) name(string) [replace] [Format(string)] [comment(string)] [record] [FORCEName] [FORCEStat]
 	* Check to make sure the statistic is a number, or the expression will evaluate to a number. forcestat will override this
 		if "`forcestat'"=="" {
@@ -17,19 +17,15 @@ program define stattotex
 		}
 	}
 	* These are LaTeX rules, so need to control.
-	if regexm("`name'","[0-9]") {
-		disp as error "Name cannot have numeric characters."
-		error 498
-	}
 	if "`name'"=="" {
 		disp as error "Name cannot be empty."
 		error 498
 	}
 	if !regexm("`name'","^[a-zA-Z]*$") {
-		disp as error "Name can only contain standard letters."
+		disp as error "Name can only contain letters in the English alphabet."
 		error 498
 	}
-	* Make sure you don't try to overwrite an existing LaTeX symbol/command. This is an imperfect approach, since packages might create extra commands. Computationally this makes the package slower, but not by too much. The forcename option will skip this step, but you risk breaking your LaTeX document if you try to overwrite an existing LaTeX command.
+	* Make sure you don't try to overwrite an existing LaTeX symbol/command. This is an imperfect approach, since packages might create extra commands. Computationally this makes the package slower, but is barely noticeable. The forcename option will skip this step, but you risk breaking your LaTeX document if you try to overwrite an existing LaTeX command.
 	if "`forcename'"=="" {
 		cap qui findfile "stattotex_SYMLIST.txt"
 		tempname SYMLIST
@@ -37,8 +33,10 @@ program define stattotex
 		file read `SYMLIST' linecur
 			while r(eof)==0 {
 				file read `SYMLIST' linecur
-				if "`macval(linecur)'" == "\" + "`name'" {
-					disp as error "This is name is already an existing LaTeX command. Using it this will very likely break your LaTeX document."
+				tempname potentialLaTeXcmd
+				local `potentialLaTeXcmd' = "\" + "`name'"
+				if "`macval(linecur)'" == "``potentialLaTeXcmd''" {
+					disp as error "``potentialLaTeXcmd'' is already an existing LaTeX command. Using this name will likely break your LaTeX document."
 					disp as error "Use forcename option to do this anyways (highly discouraged)."
 					error 498
 				}
@@ -53,10 +51,17 @@ program define stattotex
 		* Otherwise, apply the specified formatting.
 		else {
 			local `statstring' = string(`statistic', "`format'")
+			if "``statstring''"=="" {
+				disp as error "Option format incorrectly specified. See documentation."
+				error 498
+			}
 		}
 	}
 	else {
-		local `statstring' "`statistic'"
+		if "`format'"!="" {
+			disp as text "Warning: option format incompatible with forcestat, format ignored."
+		}
+		local `statstring' `statistic'
 	}
 	* Add a comment if there is one.
 	if "`comment'"!="" {
@@ -80,7 +85,7 @@ program define stattotex
 	tempname newtexfile
 	tempfile `newtexfile'
 	file open `newtexfile' using "``newtexfile''", w
-	* If the using LaTeX file already exists, we need to copy its contents over to the new file. If the name has already been used, we either need to skip the line or throw an error if replace has not been specified.
+	* If the using LaTeX file already exists, we need to copy its contents over to the new file. If the statistic name has already been used, we either need to skip the line or throw an error if replace has not been specified.
 	cap confirm file "`using'"
 	if _rc==0 {
 		tempname oldtexfile
@@ -88,11 +93,17 @@ program define stattotex
 		* Iterate over the lines of the file.
 		file read `oldtexfile' linecur
 		while r(eof)==0 {
-			if regexm(subinstr("`macval(linecur)'", "\newcommand{", "", .),"`name'") {
+		    * Check that the name hasn't already been used.
+			tempname throwaway
+			local `throwaway' = regexm("`macval(linecur)'","\{\\([^)]+)[a-zA-Z]+\}")
+			tempname potentialName
+			local `potentialName' = substr(regexs(0),3,strlen(regexs(0))-3)
+			if "``potentialName''"=="`name'" {
+			    * If name has already been used and replace option not specified, then throw error.
 				if ("`replace'"=="") {
 					file close `oldtexfile'
 					file close `newtexfile'
-					disp as error "Name already exists in `using'. Use replace option to overwrite."
+					disp as error "A statistic named '`name'' already exists in `using'. Use replace option to overwrite."
 					error 498
 				}
 			}
@@ -109,6 +120,7 @@ program define stattotex
 			erase "`using'"
 		}
 	}
+	* If the using file does not exist, none of the above is necessary and we'll just create a new file.
 	else {
 		disp as text "File `using' not found, will be created."
 	}
@@ -117,4 +129,5 @@ program define stattotex
 	file close `newtexfile'
 	* Copy the temporary file over to its final location.
 	cp "``newtexfile''" "`using'"
+	disp as text "Successfully outputed the statistic '`name'' with value ``statstring'' to `using'."
 end
