@@ -1,5 +1,5 @@
 clear all
-global output  "C:\Users\iansa\Github\stattotex"
+global output  "C:\Users\iansa\Documents\Github\stattotex"
 
 * This do file has examples of how to use stattotex command.
 
