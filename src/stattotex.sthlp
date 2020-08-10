@@ -62,7 +62,7 @@ In order to utilize the output of {cmd:stattotex}, you must include the file cal
 
 {phang}{opt stat:istic(#)} specifies the statistic that you want to output to LaTeX, which can be specified as a number (e.g. 1.234), an expression that evaluates to a number (e.g. 2*3+4), or a Stata macro that evaluates to a number 
 (e.g. $mystat). The option also accepts a string, so long as the string has numeric contents (e.g. "1.234") or is an expression that evaluates to
-a number (e.g. "2*3+4)"). If for some reason you want to override these limitations, use the {cmdab:forces:tat} option.
+a number (e.g. "2*(3+4)"). If for some reason you want to override these limitations, use the {cmdab:forces:tat} option.
 
 {phang}{opt name(string)} assigns a name to your statistic. The name can only contain letters in the English alphabet, as this is necessary for LaTeX to compile properly. {cmd:stattotex} also ensures that the name is not a default
 LaTeX command, such as \Beta, unless the {cmdab:forcen:ame} option is also used. NB: while {cmd:stattotex} checks against a list of base LaTeX commands to ensure no conflicts, it cannot control for command names used by
@@ -100,24 +100,24 @@ have more than 2 decimals.
 {title:Examples}
 
 {pstd}The most basic command is this:{p_end}
-{phang2}. {stata stattotex using "~/Desktop/numbersintext.tex", statistic(12345) name(statA) replace}{p_end}
-{phang2}This will put the line {it:\newcommand{statA}{12345}} into the file numbersintext.tex.{p_end}
+{phang2}. {stata stattotex using "~/Desktop/stattotexexample.tex", statistic(12345) name(statA) replace}{p_end}
+{phang2}This will put the line {it:\newcommand{statA}{12345}} into the file stattotexexample.tex.{p_end}
 
 {pstd}You can choose how you want to format the statistic using normal Stata formatting with the {opt f:ormat(%fmt)} option:{p_end}
-{phang2}. {stata stattotex using "~/Desktop/numbersintext.tex", stat(12345.678) name(statB) replace}{p_end}
-{phang2}This will put the line {it:\newcommand{statB}{12345.68}} into the file numbersintext.tex, because the {opt f:ormat(%fmt)} option was not specified and {cmd:stattotex} rounds to 2 decimal places by default.{p_end}
-{phang2}. {stata stattotex using "~/Desktop/numbersintext.tex", stat(12345.678) name(statB) replace format("%9.3f")}{p_end}
-{phang2}Let's try again. This will put the line {it:\newcommand{statB}{12345.678}} into the file numbersintext.tex.{p_end}
-{phang2}. {stata stattotex using "~/Desktop/numbersintext.tex", stat(12345.003) name(statC) replace f("%9.0fc")}{p_end}
-{phang2}This will put the line {it:\newcommand{statC}{12,345}} into the file numbersintext.tex.{p_end}
+{phang2}. {stata stattotex using "~/Desktop/stattotexexample.tex", stat(12345.678) name(statB) replace}{p_end}
+{phang2}This will put the line {it:\newcommand{statB}{12345.68}} into the file stattotexexample.tex, because the {opt f:ormat(%fmt)} option was not specified and {cmd:stattotex} rounds to 2 decimal places by default.{p_end}
+{phang2}. {stata stattotex using "~/Desktop/stattotexexample.tex", stat(12345.678) name(statB) replace format("%9.3f")}{p_end}
+{phang2}Let's try again. This will put the line {it:\newcommand{statB}{12345.678}} into the file stattotexexample.tex.{p_end}
+{phang2}. {stata stattotex using "~/Desktop/stattotexexample.tex", stat(12345.003) name(statC) replace f("%9.0fc")}{p_end}
+{phang2}This will put the line {it:\newcommand{statC}{12,345}} into the file stattotexexample.tex.{p_end}
 
 {pstd}You can comment of your choice to the statistic using the {opt comment(string)} option. This is useful if you want to note where the statistic came from in your code.{p_end}
-{phang2}. {stata stattotex using "~/Desktop/numbersintext.tex", stat(12345.67) name(statD) replace comment("Created by the stattotex help file.")}{p_end}
-{phang2}This will put the line {it:\newcommand{statD}{12345.678} % Created by the stattotex help file.} into the file numbersintext.tex.{p_end}
+{phang2}. {stata stattotex using "~/Desktop/stattotexexample.tex", stat(12345.67) name(statD) replace comment("Created by the stattotex help file.")}{p_end}
+{phang2}This will put the line {it:\newcommand{statD}{12345.678} % Created by the stattotex help file.} into the file stattotexexample.tex.{p_end}
 
 {pstd}You can you can also record the exact date and time when your statistic was made using {opt record}.{p_end}
-{phang2}. {stata stattotex using "~/Desktop/numbersintext.tex", stat(3.14) name(statE) replace record}{p_end}
-{phang2}This will put the line {it:\newcommand{statE}{3.14} % Created by stattotex at $S_TIME on $S_DATE.} into the file numbersintext.tex.{p_end}
+{phang2}. {stata stattotex using "~/Desktop/stattotexexample.tex", stat(3.14) name(statE) replace record}{p_end}
+{phang2}This will put the line {it:\newcommand{statE}{3.14} % Created by stattotex at $S_TIME on $S_DATE.} into the file stattotexexample.tex.{p_end}
 
 
 {marker latex}{...}
