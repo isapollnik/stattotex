@@ -1,5 +1,6 @@
 v 0.1
 d stattotex: Exporting values for inclusion in LaTeX.
+d Distribution-Date: 20200810
 f stattotex.ado
 f stattotex.sthlp
 F stattotex_SYMLIST.txt
