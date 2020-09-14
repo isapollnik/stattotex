@@ -65,7 +65,7 @@ In order to utilize the output of {cmd:stattotex}, you must include the file cal
 a number (e.g. "2*(3+4)"). If for some reason you want to override these limitations, use the {cmdab:forces:tat} option.
 
 {phang}{opt name(string)} assigns a name to your statistic. The name can only contain letters in the English alphabet, as this is necessary for LaTeX to compile properly. {cmd:stattotex} also ensures that the name is not a default
-LaTeX command, such as \Beta, unless the {cmdab:forcen:ame} option is also used. NB: while {cmd:stattotex} checks against a list of base LaTeX commands to ensure no conflicts, it cannot control for command names used by
+LaTeX command, such as \beta, unless the {cmdab:forcen:ame} option is also used. NB: while {cmd:stattotex} checks against a list of base LaTeX commands to ensure no conflicts, it cannot control for command names used by
 packages in your LaTeX file.
 
 {dlgtab:Replacing}
@@ -83,15 +83,15 @@ have more than 2 decimals.
 
 {phang}{opt record} records the date and time the statistic was created as a comment in the {it:using} document, and states that the statistic was produced by {cmd:stattotex}. This is useful mainly for transparency/replication purposes. 
 
-{phang}{opt comment(string)} creates a comment of your choosing in the {it:using} document, besides your statistic.
+{phang}{opt comment(string)} creates a comment of your choosing in the {it:using} document, beside your statistic.
 
 {phang} Options {opt record} and {opt comment(string)} can be specified together without any issues.
 
 {dlgtab:Advanced}
 
-{phang}{opt forcen:ame} overrides {cmd:stattotex}'s default name checking.
+{phang}{opt forcen:ame} overrides {cmd:stattotex}'s default name checking, which ensures your chosen name isn't an existing LaTeX command.
 
-{phang}{opt forces:tat} overrides {cmd:stattotex}'s default name checking. NB: the option {opth f:ormat(%fmt)} will be ignored if {opt forces:tat} is specified.
+{phang}{opt forces:tat} overrides {cmd:stattotex}'s default statistic checking, which ensures the statistic evaluates to a number. NB: the option {opth f:ormat(%fmt)} will be ignored if {opt forces:tat} is specified.
 
 {phang} Both forcing options can cause your LaTeX document to break before compiling and thus their use is discouraged.
 
@@ -117,7 +117,7 @@ have more than 2 decimals.
 
 {pstd}You can you can also record the exact date and time when your statistic was made using {opt record}.{p_end}
 {phang2}. {stata stattotex using "~/Desktop/stattotexexample.tex", stat(3.14) name(statE) replace record}{p_end}
-{phang2}This will put the line {it:\newcommand{statE}{3.14} % Created by stattotex at $S_TIME on $S_DATE.} into the file stattotexexample.tex.{p_end}
+{phang2}This will put the line {it:\newcommand{statE}{3.14} % Created by stattotex at $S_TIME on $S_DATE.} into the file stattotexexample.tex, where $S_TIME and $S_DATE will evaluate to the current time and date.{p_end}
 
 
 {marker latex}{...}
