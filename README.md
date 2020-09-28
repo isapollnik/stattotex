@@ -5,3 +5,4 @@ See the PDF and do file for more details. Preliminary release - still under cons
 
 To download, run the following command: `net install stattotex, from("https://raw.github.com/isapollnik/stattotex/master/src/") replace`
 
+stattotex is still under construction! If you have comments or suggestions, please feel free to contact me.
