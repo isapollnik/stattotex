@@ -1,4 +1,4 @@
-v 0.1
+v 0.2
 d Ian Sapollnik
 d isapollnik@princeton.edu
 p stattotex Exporting values for inclusion in LaTeX.

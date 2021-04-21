@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.1  10august2020}{...}
+{* *! version 0.2  20april2021}{...}
 {viewerjumpto "Syntax" "stattotex##syntax"}{...}
 {viewerjumpto "Description" "stattotex##description"}{...}
 {viewerjumpto "Options" "stattotex##options"}{...}
@@ -76,8 +76,7 @@ If a statistic with the same name already exists and {opt replace} is not specif
 
 {dlgtab:Formatting}
 
-{phang}{opth f:ormat(%fmt)} formats the statistic using standard Stata syntax. See {help format:formatting help} for details. If the option is not used, {cmd:stattotex} will round to 2 decimal places by default when statistics
-have more than 2 decimals.
+{phang}{opth f:ormat(%fmt)} formats the statistic using standard Stata syntax. See {help format:formatting help} for details. If the option is not used, {cmd:stattotex} will export the statistic as-is.
 
 {dlgtab:Documentation}
 
@@ -111,11 +110,11 @@ have more than 2 decimals.
 {phang2}. {stata stattotex using "~/Desktop/stattotexexample.tex", stat(12345.003) name(statC) replace f("%9.0fc")}{p_end}
 {phang2}This will put the line {it:\newcommand{statC}{12,345}} into the file stattotexexample.tex.{p_end}
 
-{pstd}You can comment of your choice to the statistic using the {opt comment(string)} option. This is useful if you want to note where the statistic came from in your code.{p_end}
+{pstd}You can add the comment of your choice to the statistic using the {opt comment(string)} option. This is useful if you want to note where the statistic came from in your code.{p_end}
 {phang2}. {stata stattotex using "~/Desktop/stattotexexample.tex", stat(12345.67) name(statD) replace comment("Created by the stattotex help file.")}{p_end}
 {phang2}This will put the line {it:\newcommand{statD}{12345.678} % Created by the stattotex help file.} into the file stattotexexample.tex.{p_end}
 
-{pstd}You can you can also record the exact date and time when your statistic was made using {opt record}.{p_end}
+{pstd}You can also record the exact date and time when your statistic was made using {opt record}.{p_end}
 {phang2}. {stata stattotex using "~/Desktop/stattotexexample.tex", stat(3.14) name(statE) replace record}{p_end}
 {phang2}This will put the line {it:\newcommand{statE}{3.14} % Created by stattotex at $S_TIME on $S_DATE.} into the file stattotexexample.tex, where $S_TIME and $S_DATE will evaluate to the current time and date.{p_end}
 
@@ -131,4 +130,4 @@ Then, if you have a statistic called "maincoef", you can call this statistic in 
 
 {pstd}Ian Sapollnik{p_end}
 {pstd}Department of Economics and School of Public and International Affairs, Princeton University{p_end}
-{pstd}isapollnik@princeton.edu{p_end}
+{pstd}isapollnik [at] theuniversityabove [dot] edu{p_end}

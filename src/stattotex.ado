@@ -1,7 +1,7 @@
-*! version 0.1  10aug2020
-* This program exports numbers in Stata for easy inclusion in LaTeX documents
+*! version 0.2  20apr2021
+* This program exports numbers in Stata for easy inclusion in LaTeX documents.
 * Author: Ian Sapollnik
-* Date: August 10, 2020
+* Date: April 20, 2021
 program define stattotex
 	version 10.0
 	syntax using/, STATistic(string) name(string) [replace] [Format(string)] [comment(string)] [record] [FORCEName] [FORCEStat]
@@ -23,6 +23,7 @@ program define stattotex
 	}
 	if !regexm("`name'","^[a-zA-Z]*$") {
 		disp as error "Name can only contain letters in the English alphabet."
+		disp as error "Use forcename option to do this anyways (highly discouraged)."
 		error 498
 	}
 	* Make sure you don't try to overwrite an existing LaTeX symbol/command. This is an imperfect approach, since packages might create extra commands. Computationally this makes the package slower, but is barely noticeable. The forcename option will skip this step, but you risk breaking your LaTeX document if you try to overwrite an existing LaTeX command.
@@ -129,5 +130,5 @@ program define stattotex
 	file close `newtexfile'
 	* Copy the temporary file over to its final location.
 	cp "``newtexfile''" "`using'"
-	disp as text "Successfully outputed the statistic '`name'' with value ``statstring'' to `using'."
+	disp as text "Successfully exported the statistic '`name'' with value ``statstring'' to `using'."
 end
