@@ -21,7 +21,7 @@ program define stattotex
 		disp as error "Name cannot be empty."
 		error 498
 	}
-	if !regexm("`name'","^[a-zA-Z]*$") {
+	if "`forcename'"=="" & !regexm("`name'","^[a-zA-Z]*$") {
 		disp as error "Name can only contain letters in the English alphabet."
 		disp as error "Use forcename option to do this anyways (highly discouraged)."
 		error 498
