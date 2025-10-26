@@ -129,5 +129,5 @@ Then, if you have a statistic called "maincoef", you can call this statistic in 
 {title:Author}
 
 {pstd}Ian Sapollnik{p_end}
-{pstd}Department of Economics and School of Public and International Affairs, Princeton University{p_end}
-{pstd}isapollnik [at] theuniversityabove [dot] edu{p_end}
+{pstd}Department of Economics, MIT{p_end}
+{pstd}ian_s [at] theuniversityabove [dot] edu{p_end}
