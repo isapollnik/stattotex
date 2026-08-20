@@ -1,5 +1,5 @@
 clear all
-global output  "C:\Users\iansa\Documents\Github\stattotex"
+global output  "YOUR PATH HERE"
 
 * This do file has examples of how to use stattotex command.
 
@@ -49,6 +49,32 @@ stattotex using "$output/numbersintext.tex", stat(`meanZ') name(meanZ) replace f
 stattotex using "$output/numbersintext.tex", stat(exp(`meanZ'^2-1)/100+3) name(complexexample) replace f("%9.3fc") record
 	// produces \newcommand{\complexexample}{4.123} % Created by stattotex at 14:37:19 on 28 Mar 2020.
 
+
+* Statistics don't have to be numbers. The string option writes whatever you put in stat() into the tex file as-is, skipping the check that it evaluates to a real number.
+stattotex using "$output/numbersintext.tex", stat("Massachusetts") name(statestring) replace string
+	// produces \newcommand{\statestring}{Massachusetts}
+* This is useful for things like labels, or a significance star that you compute in code.
+qui reg Y X
+local star = cond(2*ttail(e(df_r),abs(_b[X]/_se[X]))<0.01,"***",cond(2*ttail(e(df_r),abs(_b[X]/_se[X]))<0.05,"**",cond(2*ttail(e(df_r),abs(_b[X]/_se[X]))<0.1,"*","")))
+stattotex using "$output/numbersintext.tex", stat("`star'") name(Xstar) replace string
+	// produces \newcommand{\Xstar}{} when the coefficient on X is insignificant
+* The LaTeX special characters % & $ # _ are escaped for you.
+stattotex using "$output/numbersintext.tex", stat("Roughly 50% of firms") name(sharefirms) replace string
+	// produces \newcommand{\sharefirms}{Roughly 50\% of firms}
+* If you escape them yourself, they aren't escaped a second time - this produces exactly the same line as above.
+stattotex using "$output/numbersintext.tex", stat("Roughly 50\% of firms") name(sharefirms) replace string
+* The characters \ { } are never escaped, so LaTeX markup still passes through.
+stattotex using "$output/numbersintext.tex", stat("\textbf{very large}") name(magnitude) replace string
+	// produces \newcommand{\magnitude}{\textbf{very large}}
+
+* Finally, you can wipe every statistic out of a tex file with clearall. This is useful at the top of a do file that rebuilds all of your numbers from scratch, so that statistics you no longer produce don't linger in the file. We'll demonstrate on a scratch file so as not to wipe out the examples above.
+stattotex using "$output/clearexample.tex", stat(1.23) name(oldstat)
+stattotex using "$output/clearexample.tex", clearall
+	// empties clearexample.tex, but leaves the (now empty) file in place so that \input still works
+* You can also clear the file and write a new statistic in one go.
+stattotex using "$output/clearexample.tex", stat(1) name(firststat) clearall
+	// empties clearexample.tex and then produces \newcommand{\firststat}{1} as its only line
+erase "$output/clearexample.tex"
 
 /* Advanced: LaTeX has a lot of built-in commands. So if you want to name one of 
  your commands "beta", you'll run into issues when you try to compile, as LaTeX 
