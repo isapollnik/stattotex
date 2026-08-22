@@ -32,17 +32,24 @@ program define stattotex
 		disp as text "Cleared all statistics from `using'."
 		exit
 	}
-	* Check to make sure the statistic is a number, or the expression will evaluate to a number. forcestat and string will override this
-		if "`forcestat'"=="" & "`string'"=="" {
-			tempname statistic_check
-			cap local `statistic_check' = `statistic'
-			cap confirm number ``statistic_check''
+	* Check to make sure the statistic is a number, or the expression will evaluate to a number. forcestat and string will override this.
+	* The statistic is also evaluated here, into a scalar, rather than later on. Everything below this point calls r-class commands (findfile, file read), which wipe out the caller's r() results, so an expression like statistic(r(F)) has to be resolved before any of them run.
+	tempname statvalue
+	if "`forcestat'"=="" & "`string'"=="" {
+		tempname statistic_check
+		cap local `statistic_check' = `statistic'
+		cap confirm number ``statistic_check''
 		if _rc!=0 {
 			disp as error "Statistic must be a real number or evaluate to a real number."
 			disp as error "Use the string option to export text instead, or the forcestat option if you wish to proceed (highly discouraged)."
 			error 498
 		}
+		scalar `statvalue' = `statistic'
 	}
+	* Hold the caller's r() results and put them back before exiting, so that consecutive calls such as statistic(r(F)) followed by statistic(r(df_r)) both see the results of the same estimation or test command.
+	tempname rhold
+	cap _return hold `rhold'
+	local returnheld = (_rc==0)
 	* These are LaTeX rules, so need to control.
 	if "`name'"=="" {
 		disp as error "Name cannot be empty."
@@ -77,11 +84,11 @@ program define stattotex
 	if "`forcestat'"=="" & "`string'"=="" {
 		* If no formatting specified, convert to string as-is.
 		if "`format'"=="" {
-			local `statstring' = string(`statistic')
+			local `statstring' = string(`statvalue')
 		}
 		* Otherwise, apply the specified formatting.
 		else {
-			local `statstring' = string(`statistic', "`format'")
+			local `statstring' = string(`statvalue', "`format'")
 			if "``statstring''"=="" {
 				disp as error "Option format incorrectly specified. See documentation."
 				error 498
@@ -205,5 +212,7 @@ program define stattotex
 	file close `newtexfile'
 	* Copy the temporary file over to its final location.
 	copy "``newtexfile''" "`using'", replace
+	* Put the caller's r() results back now that the r-class commands above are done with.
+	if `returnheld' cap _return restore `rhold'
 	disp as text `"Successfully exported the statistic '`name'' with value ``statstring'' to `using'."'
 end
